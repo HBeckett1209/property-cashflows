@@ -2,7 +2,9 @@ import helper_functions as help
 import datetime as dt
 import os 
 
-# help.update_swap_rates()
+AsAtDate = str(dt.datetime.now().date()-dt.timedelta(days=1))
+
+help.update_swap_rates()
 
 # raw_mri_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows\\20250306 Mri'
 # help.upload_raw_mri_files(raw_mri_filepath,effective_date = dt.date(2024,12,31))
@@ -20,9 +22,9 @@ import os
 
 help.update_detailed_swap_rates()
 
-cashflows = help.generate_contracted_cashflows('2026-01-21')
+cashflows = help.generate_contracted_cashflows(AsAtDate)
 
-dv01, cashflows = help.calculate_dv01('2026-01-21',input_cashflows=None)
+dv01, cashflows = help.calculate_dv01(AsAtDate,input_cashflows=None)
 
 print(dv01)
 

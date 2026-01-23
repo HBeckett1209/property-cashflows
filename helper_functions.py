@@ -531,6 +531,7 @@ def generate_contracted_cashflows(AsAtDate):
         consolidated_dmadjusted_cashflows.to_sql('ContractedCashflowsDmAdj',con=henrysconnection,
                                                 if_exists='replace',index=False)
     else:
+        consolidated_dmadjusted_cashflows = consolidated_dmadjusted_cashflows.drop_duplicates()
         consolidated_dmadjusted_cashflows.to_sql('ContractedCashflowsDmAdj',con=henrysconnection,
                                              if_exists='append',index=False)
 
