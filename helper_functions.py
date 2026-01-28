@@ -663,13 +663,14 @@ def calculate_dv01(AsAtDate,input_cashflows=None):
         try:
             smaller_t_d = max([td for td in local_time_diffs if td <= time_diff])
         except:
-            return swap_rates[
-                (swap_rates['BaseCCY'] == a_or_j)&(swap_rates['time_diff']==swap_rates['time_diff'].min())]['Mean'].values[0]
+            min_time_diff = swap_rates[(swap_rates['BaseCCY'] == a_or_j)]['time_diff'].min()
+            return swap_rates[(swap_rates['BaseCCY'] == a_or_j)&(swap_rates['time_diff']==min_time_diff)]['Mean'].values[0]
         try:
             larger_t_d = min([td for td in local_time_diffs if td >= time_diff])
         except:
+            max_time_diff = swap_rates[(swap_rates['BaseCCY'] == a_or_j)]['time_diff'].max()
             return swap_rates[
-                (swap_rates['BaseCCY'] == a_or_j)&(swap_rates['time_diff']==swap_rates['time_diff'].max())]['Mean'].values[0]
+                (swap_rates['BaseCCY'] == a_or_j)&(swap_rates['time_diff']==max_time_diff)]['Mean'].values[0]
 
         if smaller_t_d == time_diff or larger_t_d == time_diff:
             return swap_rates[(swap_rates['BaseCCY'] == a_or_j)&(swap_rates['time_diff'] == time_diff)]['Mean'].values[0]
