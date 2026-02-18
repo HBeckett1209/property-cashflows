@@ -206,8 +206,11 @@ def upload_metrics_summary_file(filepath,add_on=False):
     current_valuation_query = """SELECT DISTINCT [Valuation Date]
     from PropertyCashflows.dbo.PropertyMetricsSummaryNonMRI"""
 
-    current_valuation_dates = pd.read_sql(current_valuation_query,
-                                          con=henrysconnection)
+    try:
+        current_valuation_dates = pd.read_sql(current_valuation_query,
+                                            con=henrysconnection)
+    except:
+        current_valuation_dates = pd.DataFrame({"Valuation Date":[None]})
 
     mfs = pd.read_csv('PortfolioMetricsSummary.csv',thousands = ',')
     mf_column_changer_dict = {c: c.split(' (')[0] for c in mfs.columns}
