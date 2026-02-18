@@ -13,7 +13,7 @@ def db_connection(server, database):
         print("Error establishing database connection:", e)
         return None
     
-henrysconnection = db_connection('localhost\HENRYSSERVER','PropertyCashflows')
+henrysconnection = db_connection('EASQLDEV','PropertyCashflows')
 
 def update_swap_rates():
     """We take discount margins from the 10y AUD/JPY swap rates."""
@@ -59,7 +59,7 @@ def comma_remover(string_to_convert):
 
 def upload_raw_mri_files(filepath,effective_date=None):
 
-    henrysconnection = db_connection('localhost\HENRYSSERVER','PropertyCashflows')
+    henrysconnection = db_connection('EASQLDEV','PropertyCashflows')
     today = dt.datetime.now()
     if effective_date == None:
         effective_dates = [dt.date(2024+year,month,1) for year in range(5) for month in (1,7)]
@@ -168,7 +168,7 @@ def upload_metrics_file(filepath,add_on=False):
         replacementQ = 'append'
     else:
         replacementQ = 'replace'
-    henrysconnection = db_connection('localhost\HENRYSSERVER','PropertyCashflows')
+    henrysconnection = db_connection('EASQLDEV','PropertyCashflows')
     os.chdir(filepath)
 
     metrics_file_data = dict()
@@ -199,7 +199,7 @@ def upload_metrics_file(filepath,add_on=False):
 def upload_metrics_summary_file(filepath,add_on=False):
     #Uploads the metrics summary page from the Metrics file (non-MRI)
     #Includes valuer-provided vals, cap rates and discount rates.
-    henrysconnection = db_connection('localhost\HENRYSSERVER','PropertyCashflows')
+    henrysconnection = db_connection('EASQLDEV','PropertyCashflows')
     os.chdir(filepath)
 
     #Anything to add?
@@ -718,3 +718,10 @@ def calculate_dv01(AsAtDate,input_cashflows=None):
     DV01_by_property.to_sql('DV01_values',con=henrysconnection,if_exists='append',index=False)
     
     return DV01_by_property,contracted_cashflows
+
+
+def get_dv01_asat_dates():
+    query = """SELECT distinct AsAtDate
+  FROM [PropertyCashflows].[dbo].[DV01_values]"""
+    dv01_dates = pd.read_sql(query,con=henrysconnection)
+    return dv01_dates

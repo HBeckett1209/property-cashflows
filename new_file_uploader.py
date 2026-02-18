@@ -4,23 +4,23 @@ import os
 
 AsAtDate = str(dt.datetime.now().date()-dt.timedelta(days=1))
 
-# help.update_swap_rates()
+help_me.update_swap_rates()
 
-# raw_mri_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows\\20250306 Mri'
-# help.upload_raw_mri_files(raw_mri_filepath,effective_date = dt.date(2024,12,31))
+raw_mri_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows\\20250306 Mri'
+help_me.upload_raw_mri_files(raw_mri_filepath,effective_date = dt.date(2024,12,31))
 
-# raw_mri_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows\\20251028 MRI (to-load (2526 B1))'
-# help.upload_raw_mri_files(raw_mri_filepath,effective_date = dt.date(2025,6,30))
+raw_mri_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows\\20251028 MRI (to-load (2526 B1))'
+help_me.upload_raw_mri_files(raw_mri_filepath,effective_date = dt.date(2025,6,30))
 
-# metrics_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows\\property-metrics'
-# help.upload_metrics_file(metrics_filepath,add_on=False)
+metrics_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows\\property-metrics'
+help_me.upload_metrics_file(metrics_filepath,add_on=False)
 
-# summary_metrics_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows'
-# help.upload_metrics_summary_file(summary_metrics_filepath, add_on=True)
+summary_metrics_filepath = 'C:\\Users\\hbeckett\\Documents\\property-cashflows'
+help_me.upload_metrics_summary_file(summary_metrics_filepath, add_on=True)
 
-# help.construct_consolidated_metrics(replace=True)
+help_me.construct_consolidated_metrics(replace=True)
 
-# help.update_detailed_swap_rates()
+help_me.update_detailed_swap_rates()
 
 cashflows = help_me.generate_contracted_cashflows(AsAtDate)
 
