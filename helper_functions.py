@@ -207,9 +207,12 @@ def upload_metrics_summary_file(filepath,add_on=False):
     from PropertyCashflows.dbo.PropertyMetricsSummaryNonMRI"""
 
     try:
+        #If the DB exists, pull the most recent valuation dates
         current_valuation_dates = pd.read_sql(current_valuation_query,
                                             con=henrysconnection)
     except:
+        #If the DB doesn't exist, assume no prior valuation dates. 
+        #The upload will instate the DB.
         current_valuation_dates = pd.DataFrame({"Valuation Date":[None]})
 
     mfs = pd.read_csv('PortfolioMetricsSummary.csv',thousands = ',')
@@ -238,6 +241,8 @@ def upload_metrics_summary_file(filepath,add_on=False):
             mf_column_type_dict[column_name] = float
 
     for column,dtype in mf_column_type_dict.items():
+        #Enforce column dtypes for consistency 
+
         if dtype == dt.datetime:
             mfs[column] = pd.to_datetime(mfs[column])
         elif dtype == float:
@@ -267,6 +272,8 @@ def upload_metrics_summary_file(filepath,add_on=False):
     return None
 
 def construct_consolidated_metrics(replace=False):
+    #Take the relevant metrics from the non MRI metrics file, then merge this onto the 
+    # MRI-style metrics file. The result is a "Consolidated metrics file"
     nonmri_metrics_query = """
     Select * 
     from PropertyCashflows.dbo.PropertyMetricsSummaryNonMRI 
@@ -316,6 +323,7 @@ def construct_consolidated_metrics(replace=False):
     metrics_consolidated = pd.merge(mri_consol,nonmri_consol,on='PropertyCode')
 
     if replace:
+        # If replace: pull everything and concat new data
         rest_of_consolidated_metrics_query = f"""Select * 
         from PropertyCashflows.dbo.PropertyMetricsConsolidated
         where EffectiveDate != '{effective_date}'
@@ -331,6 +339,10 @@ def construct_consolidated_metrics(replace=False):
 
 
 def generate_contracted_cashflows(AsAtDate):
+    #Generates the contracted cashflows in the future for property
+    #Takes relevant percentages to account for opex and the blend of 
+    #credit ratings per property
+
     assert type(AsAtDate) is str
     AsAtDateList = AsAtDate.split('-')
     AsAtDateDict = {"Year":AsAtDateList[0],"Month":AsAtDateList[1],"Day":AsAtDateList[2]}
@@ -393,8 +405,6 @@ def generate_contracted_cashflows(AsAtDate):
         grouped_tcf_cashflows['CreditRating'].str.contains('0'),
         'NR',
         grouped_tcf_cashflows['CreditRating'])
-
-    # grouped_tcf_cashflows.to_sql('GroupedTenancyCashflows',schema='dbo',if_exists='append',con=henrysconnection)
 
     grouped_property_cashflows = plc[plc['ContractedOrTotal'].str.contains("Total")].groupby(
         ['PropertyID','PropertyCode','PropertyName','CashflowType','CashFlowEffectiveDate','EffectiveDate'])['Amount'].sum()
@@ -541,6 +551,10 @@ def generate_contracted_cashflows(AsAtDate):
     return consolidated_dmadjusted_cashflows
 
 def merge_and_calculate_discount_adjustments(AsAtDate,whole_cashflows):
+    #Finds relevant discount rates, swap rates etc to calculate the DmAdj component of cashflows
+    #Like what CMF does, to then prepare the discounted cashflows to be shocked by changes
+    #To the swap curve.
+
     contracted_cashflows = whole_cashflows.copy()
     assert type(AsAtDate) is str 
     assert len(AsAtDate.split('-')) == 3
@@ -618,6 +632,9 @@ def merge_and_calculate_discount_adjustments(AsAtDate,whole_cashflows):
 
 
 def calculate_dv01(AsAtDate,input_cashflows=None):
+    #Finds the swap curve relevant to the cashflows, finds the discounted and shocked discounted values
+    #For each cashflow, then sums by property.
+
     def time_diff_finder(mnemonic):
         assert type(mnemonic) is str
         if "Swap" in mnemonic:
